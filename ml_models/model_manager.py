@@ -9,6 +9,7 @@ from .ml_algorithms.linear_regression import LinearRegressionModel
 from .ml_algorithms.random_forest import RandomForestModel  
 from .ml_algorithms.bayes_theorem import BayesTheoremModel
 from .ml_algorithms.mlp import MLPModel
+from .our_model import OurModel
 
 class ModelManager:
     def __init__(self):
@@ -33,7 +34,8 @@ class ModelManager:
             'linear_regression': LinearRegressionModel,
             'random_forest': RandomForestModel,
             'bayes_theorem': BayesTheoremModel,
-            'mlp': MLPModel
+            'mlp': MLPModel,
+            'our_model': OurModel
         }
         
         # Training status
@@ -94,7 +96,10 @@ class ModelManager:
         try:
             # Load data
             if self.on_training_progress:
-                self.on_training_progress(f"Loading {person_type} data...")
+                try:
+                    self.on_training_progress(f"Loading {person_type} data...")
+                except Exception as callback_error:
+                    print(f"Training progress callback error: {callback_error}")
                 
             X, y = self.load_person_data(person_type)
             
@@ -104,7 +109,11 @@ class ModelManager:
             
             for i, (model_name, model_class) in enumerate(self.model_classes.items()):
                 if self.on_training_progress:
-                    self.on_training_progress(f"Training {model_name} for {person_type}... ({i+1}/{total_models})")
+                    try:
+                        self.on_training_progress(f"Training {model_name} for {person_type}... ({i+1}/{total_models})")
+                    except Exception as callback_error:
+                        # If callback fails (usually due to threading), continue training
+                        print(f"Training progress callback error: {callback_error}")
                 
                 try:
                     # Create and train model
@@ -132,15 +141,24 @@ class ModelManager:
             self.models = trained_models
             
             if self.on_training_progress:
-                self.on_training_progress(f"Training complete for {person_type}!")
+                try:
+                    self.on_training_progress(f"Training complete for {person_type}!")
+                except Exception as callback_error:
+                    print(f"Training progress callback error: {callback_error}")
                 
             if self.on_training_complete:
-                self.on_training_complete(person_type, len(trained_models))
+                try:
+                    self.on_training_complete(person_type, len(trained_models))
+                except Exception as callback_error:
+                    print(f"Training complete callback error: {callback_error}")
                 
         except Exception as e:
             print(f"Error during model training: {e}")
             if self.on_training_progress:
-                self.on_training_progress(f"Training failed: {str(e)}")
+                try:
+                    self.on_training_progress(f"Training failed: {str(e)}")
+                except Exception as callback_error:
+                    print(f"Training progress callback error: {callback_error}")
         finally:
             self.is_training = False
     
@@ -151,7 +169,8 @@ class ModelManager:
                 'linear_regression': 'N/A',
                 'random_forest': 'N/A', 
                 'bayes_theorem': 'N/A',
-                'mlp': 'N/A'
+                'mlp': 'N/A',
+                'our_model': 'N/A'
             }
             
         predictions = {}
@@ -213,4 +232,15 @@ class ModelManager:
             args=(self.current_person_type,),
             daemon=True
         )
-        training_thread.start() 
+        training_thread.start()
+    
+    def get_our_model_prediction(self, temperature: float, humidity: float):
+        """Get prediction from our custom model"""
+        if 'our_model' not in self.models:
+            return 'N/A'
+            
+        try:
+            return self.models['our_model'].predict(temperature, humidity)
+        except Exception as e:
+            print(f"Error predicting with our_model: {e}")
+            return 'Error' 

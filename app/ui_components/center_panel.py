@@ -207,7 +207,7 @@ class CenterPanel:
                     ft.Card(
                         content=ft.Container(
                             content=ft.Column([
-                                ft.Text("🎯 Final Voting Decision", size=14, color="#FFD700"),
+                                ft.Text("🎯 Our Model Decision", size=14, color="#FFD700"),
                                 self.final_decision_text
                             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
                                alignment=ft.MainAxisAlignment.START),

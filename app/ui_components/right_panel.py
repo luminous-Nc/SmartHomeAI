@@ -106,10 +106,12 @@ class RightPanel:
                             content=self.log_list,
                             bgcolor="#2E3440",
                             border_radius=5,
-                            padding=ft.padding.all(8)
+                            padding=ft.padding.all(8),
+                            height=300  # Fixed height for internal scrolling
                         )
                     ], spacing=0),
-                    expand=True
+                    height=335,  # Fixed total height (25 + 300 + spacing)
+                    expand=False  # Don't expand dynamically
                 )
             ], spacing=0),
             bgcolor="#1E1E1E",

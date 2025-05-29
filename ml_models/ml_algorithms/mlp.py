@@ -19,7 +19,7 @@ class MLPModel(BaseComfortModel):
             activation='relu',          # ReLU activation function
             solver='adam',              # Adam optimizer
             learning_rate_init=0.01,    # Learning rate
-            max_iter=200,               # Maximum iterations
+            max_iter=500,               # Maximum iterations (increased to reduce convergence warnings)
             random_state=42             # For reproducible results
         )
         self.label_encoder = LabelEncoder()

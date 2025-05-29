@@ -193,7 +193,10 @@ class SmartHomeAIFlet:
         self.center_panel.heater_status = False
         self.center_panel.update_device_animations()
         
-        self.page.update()
+        try:
+            self.page.update()
+        except Exception as ui_error:
+            print(f"UI update error in disconnect thread (non-critical): {ui_error}")
     
     def _reconnect_arduino_thread(self):
         """Thread function for Arduino reconnection"""
@@ -204,7 +207,10 @@ class SmartHomeAIFlet:
         else:
             self.add_log_message("❌ ERROR: Failed to reconnect to Arduino", "#F44336")
             self.left_panel.update_arduino_status("Connection Failed", "#F44336")
-            self.page.update()
+            try:
+                self.page.update()
+            except Exception as ui_error:
+                print(f"UI update error in reconnect thread (non-critical): {ui_error}")
     
     def celsius_to_fahrenheit(self, celsius: float) -> float:
         """Convert Celsius to Fahrenheit"""
@@ -269,7 +275,12 @@ class SmartHomeAIFlet:
             self.center_panel.update_device_animations()
         
         # Update page
-        self.page.update()
+        try:
+            self.page.update()
+        except Exception as ui_error:
+            # UI update failed, likely due to threading issues during model switching
+            # This is non-critical, the UI will be updated on the next successful cycle
+            print(f"UI update error (non-critical): {ui_error}")
     
     def validate_sensor_data(self):
         """Validate sensor data and return error status"""
@@ -304,7 +315,10 @@ class SmartHomeAIFlet:
             self.ml_predictions[model_name] = "-"
         
         self.center_panel.update_ml_predictions(self.ml_predictions)
-        self.page.update()
+        try:
+            self.page.update()
+        except Exception as ui_error:
+            print(f"UI update error in handle_arduino_error (non-critical): {ui_error}")
     
     def handle_arduino_status(self, status_msg: str):
         """Handle Arduino status"""
@@ -319,7 +333,10 @@ class SmartHomeAIFlet:
             self.left_panel.update_arduino_status("Connected", "#4CAF50")
         elif "Disconnected" in status_msg:
             self.left_panel.update_arduino_status("Disconnected", "#F44336")
-        self.page.update()
+        try:
+            self.page.update()
+        except Exception as ui_error:
+            print(f"UI update error in handle_arduino_status (non-critical): {ui_error}")
     
     def handle_user_feedback(self, temperature: float, humidity: float, feeling: str):
         """Handle user feedback from Arduino"""
@@ -338,8 +355,9 @@ class SmartHomeAIFlet:
                 self.ml_predictions[model_name] = "Training..."
     
     def calculate_final_decision(self) -> str:
-        """Calculate final decision through voting"""
-        return self.model_manager.get_voting_decision(self.ml_predictions)
+        """Calculate final decision using our custom model"""
+        # return self.model_manager.get_voting_decision(self.ml_predictions)
+        return self.model_manager.get_our_model_prediction(self.current_temp, self.current_humidity)
     
     def get_system_status(self, decision: str) -> str:
         """Get system status based on decision"""
@@ -362,7 +380,10 @@ class SmartHomeAIFlet:
                 self.has_sensor_error = True
                 self.error_message = "Arduino connection failed"
                 self.left_panel.update_arduino_status("Connection Failed", "#F44336")
-                self.page.update()
+                try:
+                    self.page.update()
+                except Exception as ui_error:
+                    print(f"UI update error in arduino thread (non-critical): {ui_error}")
         
         threading.Thread(target=arduino_thread, daemon=True).start()
 
@@ -373,7 +394,10 @@ class SmartHomeAIFlet:
     def on_model_training_complete(self, person_type: str, models_count: int):
         """Called when model training is complete"""
         self.add_log_message(f"🧠 Model training complete for {person_type} ({models_count} models)", "#4CAF50")
-        self.page.update()
+        try:
+            self.page.update()
+        except Exception as ui_error:
+            print(f"UI update error in training complete callback (non-critical): {ui_error}")
     
     def on_model_training_progress(self, progress_message: str):
         """Called during model training progress"""
