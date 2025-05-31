@@ -98,9 +98,9 @@ class SmartHomeAIFlet:
         
         # Set window properties
         self.page.window.width = 1440   
-        self.page.window.height = 800
+        self.page.window.height = 900
         self.page.window.min_width = 1440
-        self.page.window.min_height = 800
+        self.page.window.min_height = 900
         self.page.window.resizable = True
         self.page.window.maximizable = True
         

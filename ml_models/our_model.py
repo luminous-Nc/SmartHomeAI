@@ -3,7 +3,7 @@ Our Model - Our own comfort prediction model
 """
 
 from .base_model import BaseComfortModel
-from typing import List, Dict, Any, Optional
+import numpy as np
 
 class OurModel(BaseComfortModel):
     """Our custom comfort prediction model"""
@@ -11,7 +11,7 @@ class OurModel(BaseComfortModel):
     def __init__(self):
         super().__init__("our_model")
     
-    def predict(self, temperature: float, humidity: float, user_preferences: Optional[Dict] = None) -> str:
+    def predict(self, temperature: float, humidity: float) -> str:
         """
         Predict comfort level using our custom algorithm
         
@@ -24,20 +24,17 @@ class OurModel(BaseComfortModel):
             str: "hot", "comfortable", or "cold"
         """
         # TODO: Implement our custom prediction logic here
-        if temperature > 75.2:
-            return "hot"
-        elif temperature < 74.8:
-            return "cold"
-        else:
-            return "comfortable"
+       
+        return "comfortable"
     
-    def train(self, training_data: List[Dict[str, Any]]):
+    def train(self, X: np.ndarray, y: np.ndarray):
         """
         Train our custom model
         
         Args:
-            training_data: Training data list, each element contains temperature, humidity, comfort_label
+            X: Feature matrix of shape (n_samples, 2) containing [temperature, humidity]
+            y: Target labels of shape (n_samples,) containing comfort labels
         """
         # TODO: Implement our custom training logic here
-        self.is_trained = True
-        pass 
+        
+        self.is_trained = True 

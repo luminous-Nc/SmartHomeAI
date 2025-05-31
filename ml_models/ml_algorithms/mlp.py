@@ -26,7 +26,7 @@ class MLPModel(BaseComfortModel):
         self.scaler = StandardScaler()  # For input normalization
         self.feature_names = ['temperature', 'humidity']
     
-    def predict(self, temperature: float, humidity: float, user_preferences: Dict[str, Any] = None) -> str:
+    def predict(self, temperature: float, humidity: float) -> str:
         """
         Use scikit-learn MLPClassifier to predict comfort level
         
@@ -46,28 +46,14 @@ class MLPModel(BaseComfortModel):
         
         return prediction
     
-    def train(self, training_data: List[Dict[str, Any]]) -> None:
+    def train(self, X: np.ndarray, y: np.ndarray) -> None:
         """
         Train MLP model using scikit-learn
         
         Uses backpropagation algorithm implemented in scikit-learn
         """
-        if not training_data:
+        if X.size == 0 or y.size == 0:
             raise ValueError("No training data provided")
-        
-        print(f"Training MLP model with {len(training_data)} data points")
-        print(f"Network architecture: Input(2) -> Hidden{self.model.hidden_layer_sizes} -> Output(3)")
-        print(f"Learning rate: {self.model.learning_rate_init}")
-        
-        # Prepare training data
-        X = []
-        y = []
-        
-        for data in training_data:
-            X.append([data['temperature'], data['humidity']])
-            y.append(data.get('comfort_label', 'comfortable'))
-        
-        X = np.array(X)
         
         # Encode labels
         self.label_encoder.fit(['cold', 'comfortable', 'hot'])
@@ -78,8 +64,4 @@ class MLPModel(BaseComfortModel):
         
         # Train the model
         self.model.fit(X_scaled, y_encoded)
-        self.is_trained = True
-        
-        print("MLP model training completed")
-        print(f"Training accuracy: {self.model.score(X_scaled, y_encoded):.3f}")
-        print(f"Iterations completed: {self.model.n_iter_}") 
+        self.is_trained = True 

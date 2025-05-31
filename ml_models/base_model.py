@@ -3,7 +3,7 @@ Base Model Class - Defines unified interface for all machine learning algorithms
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+import numpy as np
 
 class BaseComfortModel(ABC):
     """Base class for comfort prediction models"""
@@ -13,14 +13,13 @@ class BaseComfortModel(ABC):
         self.is_trained = False
     
     @abstractmethod
-    def predict(self, temperature: float, humidity: float, user_preferences: Optional[Dict] = None) -> str:
+    def predict(self, temperature: float, humidity: float) -> str:
         """
         Predict comfort level
         
         Args:
             temperature: Current temperature (°C)
             humidity: Current humidity (%)
-            user_preferences: User preference data (optional)
         
         Returns:
             str: "hot", "comfortable", or "cold"
@@ -28,12 +27,13 @@ class BaseComfortModel(ABC):
         pass
     
     @abstractmethod 
-    def train(self, training_data: List[Dict[str, Any]]):
+    def train(self, X: np.ndarray, y: np.ndarray):
         """
         Train model
         
         Args:
-            training_data: Training data list, each element contains temperature, humidity, comfort_label
+            X: Feature matrix of shape (n_samples, 2) containing [temperature, humidity]
+            y: Target labels of shape (n_samples,) containing comfort labels
         """
         pass
     

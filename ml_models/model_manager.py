@@ -119,16 +119,8 @@ class ModelManager:
                     # Create and train model
                     model = model_class()
                     
-                    # Convert X, y to format expected by model
-                    training_data = []
-                    for x_row, y_label in zip(X, y):
-                        training_data.append({
-                            'temperature': float(x_row[0]),
-                            'humidity': float(x_row[1]),
-                            'comfort_label': str(y_label)
-                        })
-                    
-                    model.train(training_data)
+                    # Train model directly with X, y arrays
+                    model.train(X, y)
                     trained_models[model_name] = model
                     
                     self.training_progress[model_name] = "✓ Complete"

@@ -18,7 +18,7 @@ class BayesTheoremModel(BaseComfortModel):
         self.label_encoder = LabelEncoder()
         self.feature_names = ['temperature', 'humidity']
     
-    def predict(self, temperature: float, humidity: float, user_preferences: Dict[str, Any] = None) -> str:
+    def predict(self, temperature: float, humidity: float) -> str:
         """
         Use scikit-learn GaussianNB to predict comfort level
         
@@ -36,27 +36,12 @@ class BayesTheoremModel(BaseComfortModel):
         
         return prediction
     
-    def train(self, training_data: List[Dict[str, Any]]):
+    def train(self, X: np.ndarray, y: np.ndarray):
         """
         Train Bayes model using scikit-learn
         
         Estimate prior probabilities and feature distribution parameters from training data
         """
-        if not training_data:
-            raise ValueError("No training data provided")
-        
-        print(f"Training Bayes' Theorem model with {len(training_data)} data points")
-        
-        # Prepare training data
-        X = []
-        y = []
-        
-        for data in training_data:
-            X.append([data['temperature'], data['humidity']])
-            y.append(data.get('comfort_label', 'comfortable'))
-        
-        X = np.array(X)
-        
         # Encode labels
         self.label_encoder.fit(['cold', 'comfortable', 'hot'])
         y_encoded = self.label_encoder.transform(y)
@@ -64,18 +49,4 @@ class BayesTheoremModel(BaseComfortModel):
         # Train the model
         self.model.fit(X, y_encoded)
         self.is_trained = True
-        
-        print(f"Bayes' Theorem model training completed.")
-        print("Class prior probabilities:")
-        
-        # Get class priors
-        class_priors = dict(zip(
-            self.label_encoder.inverse_transform(range(len(self.model.class_prior_))),
-            self.model.class_prior_
-        ))
-        
-        for class_name, prior in class_priors.items():
-            print(f"  {class_name}: {prior:.3f}")
-        
-        print("Feature distribution parameters updated")
-        print(f"Training accuracy: {self.model.score(X, y_encoded):.3f}") 
+       
